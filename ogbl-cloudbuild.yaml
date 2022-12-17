@@ -1,0 +1,13 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'gcr.io/dsd-demo-370521/pytorch-dis-ogbl-ddi:5.0',
+        '-f',
+        'ogbl.Dockerfile',
+        '.',
+      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/dsd-demo-370521/pytorch-dis-ogbl-ddi:5.0']

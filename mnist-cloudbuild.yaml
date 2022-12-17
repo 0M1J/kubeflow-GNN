@@ -1,0 +1,13 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'gcr.io/dsd-demo-370521/pytorch-dis-mnist:4.0',
+        '-f',
+        'mnist.Dockerfile',
+        '.',
+      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/dsd-demo-370521/pytorch-dis-mnist:4.0']
