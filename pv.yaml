@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-ogbl
+spec:
+  storageClassName: standard-rwo
+  capacity:
+    storage: 30Gi
+  accessModes:
+    - ReadWriteOnce
+  claimRef:
+    namespace: default
+    name: pv-ogbl-claim
+  gcePersistentDisk:
+    pdName: gke-cluster-3-nodes-default-pool-3ff4aa28-p48s
+    fsType: ext4
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: default
+  name: pv-ogbl-claim
+spec:
+  storageClassName: standard-rwo
+  volumeName: pv-ogbl
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
