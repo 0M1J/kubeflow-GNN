@@ -1,0 +1,41 @@
+apiVersion: 'kubeflow.org/v1'
+kind: 'PyTorchJob'
+metadata:
+  name: 'pytorch-dist-ogbl-gloo'
+  namespace: 'default'
+spec:
+  pytorchReplicaSpecs:
+    Master:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: 'false'
+        spec:
+          containers:
+            - name: pytorch
+              image: gcr.io/dsd-demo-370521/pytorch-dis-ogbl-ddi:5.0
+              imagePullPolicy: Always
+              args: ['--backend', 'gloo', '--epochs', '2']
+              volumeMounts:
+                - name: savedmodel
+                  mountPath: /savedmodel
+          volumes:
+            - name: savedmodel
+              persistentVolumeClaim:
+                claimName: pv-ogbl-claim-1
+
+    Worker:
+      replicas: 4
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: 'false'
+        spec:
+          containers:
+            - name: pytorch
+              image: gcr.io/dsd-demo-370521/pytorch-dis-ogbl-ddi:5.0
+              imagePullPolicy: Always
+              args: ['--backend', 'gloo', '--epochs', '2']
