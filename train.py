@@ -111,6 +111,7 @@ def train(
     batch_size,
     epoch,
     writer,
+    local_rank,
     edge_model=False,
     spd=None,
 ):
@@ -128,9 +129,12 @@ def train(
 
     all_pos_train_edges = split_edge["train"]["edge"]
     epoch_total_loss = 0
+    edge_range = range(all_pos_train_edges.shape[0])
     for perm in DataLoader(
-        range(all_pos_train_edges.shape[0]), batch_size, shuffle=True
+        edge_range, batch_size, shuffle=False, sampler=DistributedSampler(edge_range)
     ):
+        print("perm ", perm)
+        print("rank ", local_rank)
         optimizer.zero_grad()
 
         train_edge, train_label = create_train_batch(
@@ -289,6 +293,8 @@ def main():
         print('Using distributed PyTorch with {} backend'.format(args.backend))
         dist.init_process_group(backend=args.backend)
 
+    local_rank = torch.distributed.get_rank()
+
     # kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
 
     dataset = PygLinkPropPredDataset(name="ogbl-ddi")
@@ -351,7 +357,7 @@ def main():
     # )
 
     for epoch in range(1, args.epochs + 1):
-        loss = train(args, model, device, predictor, emb, adj_t, split_edge, num_nodes, torch.nn.BCELoss(), optimizer, 64*1024, epoch, writer)
+        loss = train(args, model, device, predictor, emb, adj_t, split_edge, num_nodes, torch.nn.BCELoss(), optimizer, 64*1024, epoch, writer, local_rank)
         writer.add_scalar('loss', round(loss, 4), epoch)
         acc = test(args, model, device, predictor, emb, adj_t, split_edge["valid"], Evaluator(name="ogbl-ddi"), 64*1024, epoch, writer)
         writer.add_scalar('accuracy', round(acc["Accuracy"], 4), epoch)
