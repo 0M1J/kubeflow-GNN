@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorboard-deployment
+spec:
+  selector:
+    matchLabels:
+      app: tensorboard-app
+  template:
+    metadata:
+      labels:
+        app: tensorboard-app
+    spec:
+      containers:
+        - name: tensorboard
+          image: gcr.io/dsd-demo-370521/tensorboard:1.0
+          imagePullPolicy: Always
+          workingDir: /tensorboard
+          volumeMounts:
+            - mountPath: /tensorboard
+              name: log-data
+          ports:
+            - containerPort: 6006
+      volumes:
+        - name: log-data
+          persistentVolumeClaim:
+            claimName: nfs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tensorboard-service
+spec:
+  ports:
+    - name: http
+      port: 6006
+      protocol: TCP
+      targetPort: 6006
+      nodePort: 31897
+  selector:
+    app: tensorboard-app
+  type: NodePort

@@ -1,0 +1,64 @@
+apiVersion: 'kubeflow.org/v1'
+kind: 'PyTorchJob'
+metadata:
+  name: 'm-1-w-15-e-5-pytorch-dist-ogbl-gloo'
+  namespace: 'default'
+spec:
+  pytorchReplicaSpecs:
+    Master:
+      replicas: 1
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: 'false'
+        spec:
+          containers:
+            - name: pytorch
+              image: gcr.io/dsd-demo-370521/pytorch-distributed-ogbl:1.0
+              imagePullPolicy: Always
+              args:
+                [
+                  '--backend',
+                  'gloo',
+                  '--epochs',
+                  '5',
+                  '--exp-name',
+                  'm-1-w-15-e-5',
+                ]
+              volumeMounts:
+                - name: savedmodel
+                  mountPath: /app/src/tensorboard
+          volumes:
+            - name: savedmodel
+              persistentVolumeClaim:
+                claimName: nfs
+
+    Worker:
+      replicas: 15
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: 'false'
+        spec:
+          containers:
+            - name: pytorch
+              image: gcr.io/dsd-demo-370521/pytorch-distributed-ogbl:1.0
+              imagePullPolicy: Always
+              args:
+                [
+                  '--backend',
+                  'gloo',
+                  '--epochs',
+                  '5',
+                  '--exp-name',
+                  'm-1-w-15-e-5',
+                ]
+              volumeMounts:
+                - name: savedmodel
+                  mountPath: /app/src/tensorboard
+          volumes:
+            - name: savedmodel
+              persistentVolumeClaim:
+                claimName: nfs

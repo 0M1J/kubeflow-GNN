@@ -9,13 +9,12 @@ RUN pip install torch-geometric -f https://data.pyg.org/whl/torch-1.13.0+cu116.h
 RUN pip install ogb
 RUN pip install networkx
 
-RUN mkdir -p /opt/mnist
+RUN mkdir -p /app
 
-WORKDIR /opt/mnist/src
-ADD mnist.py /opt/mnist/src/mnist.py
-ADD train.py /opt/mnist/src/train.py
+WORKDIR /app/src
+ADD train.py /app/src/train.py
 
-RUN  chgrp -R 0 /opt/mnist \
-  && chmod -R g+rwX /opt/mnist
+RUN  chgrp -R 0 /app/src \
+  && chmod -R g+rwX /app/src
 
-ENTRYPOINT ["python", "/opt/mnist/src/mnist.py"]
+ENTRYPOINT ["python", "/app/src/train.py"]

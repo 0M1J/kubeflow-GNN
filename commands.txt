@@ -1,8 +1,14 @@
 # get credentials from shell for cluster
 gcloud container clusters get-credentials cluster-3-nodes --zone us-central1-c --project dsd-demo-370521
 
+# submit a cloud build job that will be executed remotly over gcloud
+gcloud builds submit --config ogbl-cloudbuild.yaml .
+
 # add crd for pytorch and other training operators
- kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.5.0"
+kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.5.0"
 
 # create disk
 gcloud compute disks create gke-pv  --zone=us-central1-c --size=50G
+
+# Create a firewall rule to allow TCP traffic on your node port
+gcloud compute firewall-rules create test-node-port --allow tcp:NODE_PORT

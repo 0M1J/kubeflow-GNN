@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import argparse
 import os
+import pathlib
 
 from tensorboardX import SummaryWriter
 from torchvision import datasets, transforms
@@ -93,7 +94,7 @@ def main():
                         help='random seed (default: 1)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                         help='how many batches to wait before logging training status')
-    parser.add_argument('--save-model', action='store_true', default=False,
+    parser.add_argument('--save-model', action='store_true', default=True,
                         help='For Saving the current Model')
     parser.add_argument('--dir', default='logs', metavar='L',
                         help='directory where summary logs are stored')
@@ -106,7 +107,8 @@ def main():
     if use_cuda:
         print('Using CUDA')
 
-    writer = SummaryWriter(args.dir)
+    pathlib.Path("./tensorboard/logs/").mkdir(parents=True, exist_ok=True)
+    writer = SummaryWriter("./tensorboard/logs/")
 
     torch.manual_seed(args.seed)
 
@@ -147,8 +149,9 @@ def main():
         train(args, model, device, train_loader, optimizer, epoch, writer)
         test(args, model, device, test_loader, writer, epoch)
 
+    pathlib.Path("./tensorboard/models/").mkdir(parents=True, exist_ok=True)
     if (args.save_model):
-        torch.save(model.state_dict(),"mnist_cnn.pt")
+        torch.save(model.state_dict(),"./tensorboard/models/mnist_cnn.pt")
         
 if __name__ == '__main__':
     main()
