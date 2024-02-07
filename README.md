@@ -28,6 +28,15 @@ This project aims to train a neural network for predicting missing citations usi
 | 4              | 30    | 33.93 min  | 85.04%   |
 | 6              | 30    | 30.76 min  | 85.11%   |
 
+## Challenges Faced and Solutions
+- **Resource Management**: Managing resource allocation and utilization across multiple pods and nodes was a significant challenge. We addressed this by carefully monitoring resource usage, optimizing resource requests and limits, and scaling resources as needed.
+- **Networking and Communication**: Ensuring efficient communication between distributed components, especially in a cloud environment, posed challenges related to network latency and reliability. We optimized network configurations and implemented retry mechanisms to mitigate these issues.
+- **Fault Tolerance**: Ensuring system resilience in the face of failures required careful planning and implementation of fault-tolerant strategies. We leveraged Kubernetes' built-in features for automatic pod restarts and implemented application-level fault tolerance mechanisms to handle failures gracefully.
+- **Shared Data Storage**: Initially, we faced challenges in setting up shared data storage for TensorBoard visualization. We opted to use Nginx as a reverse proxy to serve TensorBoard data, ensuring seamless access to visualization logs across pods.
+- **Image Building and Deployment**: Building Docker images and storing them in the registry using Google Cloud Build was a key requirement. We configured Google Cloud Build to automatically build Docker images from our source code repository and store them in the Google Container Registry, streamlining the deployment process.
+- **GNN Training Pipelines**: Implementing GNN training pipelines required understanding the complex architecture of the GNN model and integrating it into the distributed training framework. We carefully designed and tested the training pipelines to ensure efficient distributed training across multiple nodes.
+
+
 ## Usage
 1. **Dataset**: Download and preprocess the ogbl-citations2 dataset.
 2. **Model Training**: Train the GNN model using PyTorch distributed training on a Kubeflow-enabled Kubernetes cluster.
